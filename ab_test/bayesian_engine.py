@@ -3,7 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from typing_extensions import final
-from scipy.stats import beta, gamma
 
 class bayesian_test:
     """
