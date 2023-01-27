@@ -44,21 +44,22 @@ class bayesian_test:
                 self.prior_alpha = prior_success + 1
                 self.prior_beta = prior_failure + 1
                 self.df_simulations[f'{var}'] = np.random.beta(self.prior_alpha+successes, self.prior_beta+failures, size=self.simulation_size)
-            elif analytic_method == 'numeric, continuous':
+                
+            elif analytic_method == 'numeric, continuous': # model as exponential, gamma parameter
                 self.prior_gamma_alpha = 0.1
                 self.prior_gamma_scale = 0.1
                 self.df_simulations[f'{var}'] = 1 / (np.random.gamma(
                     shape=(self.prior_gamma_alpha + successes),
-                    scale=(self.prior_gamma_scale / (1 + (self.prior_gamma_scale) * sum_of_numeric)),
+                    scale= 1/(self.prior_gamma_scale + sum_of_numeric),
                     size=self.simulation_size)
                 )
                 
-            elif analytic_method == 'numeric, discrete':
+            elif analytic_method == 'numeric, discrete': # model as poisson, gamma parameter
                 self.prior_gamma_alpha = 0.1
                 self.prior_gamma_scale = 0.1
                 self.df_simulations[f'{var}'] = np.random.gamma(
                     shape=(self.prior_gamma_alpha + sum_of_numeric),
-                    scale=(self.prior_gamma_scale / (1 + (self.prior_gamma_scale) * successes)),
+                    scale=(1 / (1 + successes)),
                     size=self.simulation_size
                 )
 
@@ -70,17 +71,6 @@ class bayesian_test:
         return prob_to_be_best, self.df_simulations
     
     @final
-    def show_posterior_distributions(self):
-        x = np.linspace(0,1,1000)
-        plt.title('Expected Values for Posteriors')
-        for var in self.dict_posteriors:
-            x_lim_min = min(self.df_simulations[f'{var}'])
-            x_lim_max = max(self.df_simulations[f'{var}'])
-            plt.plot(x, self.dict_posteriors.get(var).pdf(x), label=var)
-            plt.legend()
-        plt.xlim(x_lim_min - 0.05, x_lim_max + 0.05)
-        plt.show()
-
     def describe(self):
         if self.analytic_method == 'conversion':
             msg = "Conversion data is modeled as a binomial distribution, with each variants' binomial parameter modeled with a weak beta conjugate prior (prior beta successes = {}, prior beta failures = {}).\
@@ -89,6 +79,6 @@ class bayesian_test:
             msg = "Continuous numeric data is modeled as an exponential distribution, with each variants' parameter modeled with a weak gamma priors (prior gamma alpha = {}, prior gamma scale = {}).\
                 The expected value of the exponential distribution describing the data is the inverse of the parameter, plotted below.".format(self.prior_gamma_alpha, self.prior_gamma_scale)
         if self.analytic_method == 'numeric, discrete':
-            msg = "Continuous numeric data is modeled as a poisson distribution, with each variants' parameter modeled with a weak gamma priors (prior gamma alpha = {}, prior gamma scale = {}).\
+            msg = "Discrete numeric data is modeled as a poisson distribution, with each variants' parameter modeled with a weak gamma priors (prior gamma alpha = {}, prior gamma scale = {}).\
                 The expected value of the poisson distribution describing the data is the parameter, plotted below.".format(self.prior_gamma_alpha, self.prior_gamma_scale)
         return msg
