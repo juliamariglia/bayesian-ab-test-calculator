@@ -94,6 +94,3 @@ else:
             fig_posterior_simulations = ff.create_distplot([df_simulations['{}'.format(i)].values for i in df_simulations.columns], group_labels = df_simulations.columns, bin_size=.2, show_hist=False)
             fig_posterior_simulations.update_layout(width=1000, height=400, margin=dict(l=0, r=0, b=0, t=0), showlegend=False)
             st.write(fig_posterior_simulations)
-
-            st.markdown("**Simulation of metric using modeled parameters**")
-            st.write('Coming soon!')
