@@ -40,7 +40,7 @@ with st.expander('Input experiment data:'):
 df_experiment_data = pd.DataFrame([var_labels_ls, sample_size_ls, conversions_ls, sum_numeric_ls]).T
 df_experiment_data.columns = ['variant', 'sample_size', 'conversions', 'sum_numeric']
 df_experiment_data['conversion rate'] = (df_experiment_data.conversions/df_experiment_data.sample_size)
-df_experiment_data['avg numeric metric'] = (df_experiment_data.sum_numeric/df_experiment_data.conversions).apply(lambda x: round(x, 2))
+df_experiment_data['avg numeric metric'] = (df_experiment_data.sum_numeric/df_experiment_data.conversions).apply(lambda x: round(x, 4))
 df_experiment_data['conversion rate'] = df_experiment_data['conversion rate'].apply(lambda x: percent_formatter(x))
 
 button_calculate = st.button('Calculate')
@@ -59,7 +59,7 @@ else:
         prob_to_be_best, df_simulations = bayesian.evaluate(df_experiment_data, analytic_method=analytic_method)
         leader = prob_to_be_best[prob_to_be_best['probability to be best (%)'] > significance_threshold].variant
         if leader.any():
-            st.success(":trophy: **_" + leader[0] + "_** _is the leader!_")
+            st.success(":trophy: **_" + leader[0] + "_** _parameter is the leader!_")
         else:
             st.error(':red_circle: _No leader found._')
 
